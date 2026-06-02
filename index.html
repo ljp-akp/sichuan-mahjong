@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>四川麻将</title>
+
+<style>
+body{
+margin:0;
+background:#0f7d32;
+font-family:sans-serif;
+color:#fff;
+overflow:hidden;
+}
+
+#table{
+width:100vw;
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+}
+
+.player{
+text-align:center;
+padding:10px;
+}
+
+.ai{
+height:80px;
+}
+
+.hand{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+padding:5px;
+}
+
+.tile{
+width:42px;
+height:62px;
+background:white;
+color:black;
+border-radius:6px;
+margin:2px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+cursor:pointer;
+}
+
+#center{
+text-align:center;
+font-size:20px;
+}
+
+button{
+padding:10px 20px;
+font-size:18px;
+border:none;
+border-radius:8px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="table">
+
+<div class="player ai">
+上家（AI）<br>
+<span id="ai1"></span>
+</div>
+
+<div id="center">
+<div id="msg">四川麻将第一版</div>
+<button onclick="drawTile()">摸牌</button>
+</div>
+
+<div class="player ai">
+下家（AI）<br>
+<span id="ai2"></span>
+</div>
+
+<div class="player">
+<div>你的手牌</div>
+<div id="hand" class="hand"></div>
+</div>
+
+</div>
+
+<script>
+
+let wall=[];
+
+let player=[];
+
+let ai1=[];
+
+let ai2=[];
+
+function createWall(){
+
+wall=[];
+
+const suits=["万","条","筒"];
+
+for(let s of suits){
+
+for(let n=1;n<=9;n++){
+
+for(let i=0;i<4;i++){
+
+wall.push(n+s);
+
+}
+
+}
+
+}
+
+shuffle();
+
+}
+
+function shuffle(){
+
+for(let i=wall.length-1;i>0;i--){
+
+const j=Math.floor(Math.random()*(i+1));
+
+[wall[i],wall[j]]=[wall[j],wall[i]];
+
+}
+
+}
+
+function deal(){
+
+for(let i=0;i<13;i++){
+
+player.push(wall.pop());
+
+ai1.push(wall.pop());
+
+ai2.push(wall.pop());
+
+}
+
+player.push(wall.pop());
+
+}
+
+function render(){
+
+const hand=document.getElementById("hand");
+
+hand.innerHTML="";
+
+player.sort();
+
+player.forEach((tile,index)=>{
+
+const div=document.createElement("div");
+
+div.className="tile";
+
+div.innerText=tile;
+
+div.onclick=()=>discard(index);
+
+hand.appendChild(div);
+
+});
+
+document.getElementById("ai1").innerText=
+"手牌："+ai1.length+"张";
+
+document.getElementById("ai2").innerText=
+"手牌："+ai2.length+"张";
+
+}
+
+function discard(index){
+
+const tile=player.splice(index,1)[0];
+
+document.getElementById("msg").innerText=
+"你打出："+tile;
+
+aiTurn();
+
+render();
+
+}
+
+function drawTile(){
+
+if(wall.length===0){
+
+alert("牌摸完了");
+
+return;
+
+}
+
+player.push(wall.pop());
+
+render();
+
+}
+
+function aiTurn(){
+
+if(ai1.length){
+
+ai1.splice(
+Math.floor(Math.random()*ai1.length),
+1
+);
+}
+
+if(ai2.length){
+
+ai2.splice(
+Math.floor(Math.random()*ai2.length),
+1
+);
+}
+
+}
+
+createWall();
+
+deal();
+
+render();
+
+</script>
+
+</body>
+</html>
